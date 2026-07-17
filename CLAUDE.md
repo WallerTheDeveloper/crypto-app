@@ -78,7 +78,7 @@ nova_project/lib/
 - Theme token values live in `core/theme/` and are the source of truth for colors — reference tokens, never hardcode hex in features or widgets.
 - **Semantic color separation (strict):** price up / profit uses the theme's `gain` token; price down / loss uses the `loss` token; the `accent` token is only for interactive elements (buttons, active tabs, selected states, primary chart line). Never use `accent` to encode price movement, and never use `gain`/`loss` for generic UI.
 - The two themes are structurally identical: same layouts and spacing, only tokens differ. Do not fork layout per theme.
-- Corner radius: cards `16`, controls/buttons `12`, pills/badges fully rounded. Two font weights only: 400 and 500. Sentence case in all UI copy.
+- Corner radius: cards `16`, controls/buttons `12`, pills/badges fully rounded. Three font weights only: 400, 500 and 600 — 600 is reserved for screen titles, sheet titles, section labels and coin glyphs. Sentence case in all UI copy.
 - Every data-bound screen must implement four states: loading (skeleton shimmer), empty (designed and inviting), error (message + retry), and populated.
 - The design handoff bundle (`crypto-dashboard-flutter-design/`) is the reference for visual design (exact layouts, spacing, colors as prototyped in HTML/CSS); this file is the reference for code conventions.
 
