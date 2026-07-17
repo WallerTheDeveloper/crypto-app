@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 
 import 'core/constants/hive_boxes.dart';
+import 'core/theme/app_theme.dart';
+import 'core/theme/theme_controller.dart';
+import 'core/theme/theme_store.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,22 +15,29 @@ Future<void> main() async {
     await Hive.openBox<dynamic>(box);
   }
 
-  runApp(const ProviderScope(child: NovaApp()));
+  // Read the persisted theme before the first frame so the app never flashes
+  // the wrong theme on launch.
+  final themeStore = HiveThemeStore(Hive.box<dynamic>(HiveBoxes.prefs));
+
+  runApp(
+    ProviderScope(
+      overrides: [themeStoreProvider.overrideWithValue(themeStore)],
+      child: const NovaApp(),
+    ),
+  );
 }
 
-class NovaApp extends StatelessWidget {
+class NovaApp extends ConsumerWidget {
   const NovaApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // TODO(01-theme-tokens): swap in the Dark and Playful themes and the
-    // persisted theme controller from tasks/01-theme-tokens.md, then let
-    // tasks/04-app-shell-nav.md supply `home`. Until then this boots to a
-    // bare Inter-themed scaffold.
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = ref.watch(themeControllerProvider);
+    // TODO(04-app-shell-nav): supply `home` from tasks/04-app-shell-nav.md.
     return MaterialApp(
       title: 'Nova',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(fontFamily: 'Inter'),
+      theme: AppThemes.of(theme),
       home: const Scaffold(),
     );
   }
