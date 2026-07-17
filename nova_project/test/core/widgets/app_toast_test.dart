@@ -4,12 +4,16 @@ import 'package:nova_project/core/widgets/app_toast.dart';
 import '../../support/widget_harness.dart';
 
 void main() {
-  testWidgets('shows the message then auto-dismisses at 2200ms',
-      (tester) async {
+  testWidgets('shows the message then auto-dismisses at 2200ms', (
+    tester,
+  ) async {
     var dismissed = false;
     await tester.pumpWidget(
       themed(
-        AppToast(message: 'Added to portfolio', onDismissed: () => dismissed = true),
+        AppToast(
+          message: 'Added to portfolio',
+          onDismissed: () => dismissed = true,
+        ),
       ),
     );
 

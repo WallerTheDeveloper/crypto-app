@@ -18,9 +18,7 @@ void main() {
   }
 
   testWidgets('the shimmer gradient offset moves over time', (tester) async {
-    await tester.pumpWidget(
-      themed(const Skeleton(width: 120, height: 20)),
-    );
+    await tester.pumpWidget(themed(const Skeleton(width: 120, height: 20)));
 
     final first = shimmerOffset(tester);
     await tester.pump(const Duration(milliseconds: 300));

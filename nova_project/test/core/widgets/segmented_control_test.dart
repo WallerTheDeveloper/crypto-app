@@ -27,8 +27,9 @@ void main() {
   forEachTheme((theme) {
     final colors = AppThemes.colorsOf(theme);
 
-    testWidgets('exactly one segment paints active (${theme.name})',
-        (tester) async {
+    testWidgets('exactly one segment paints active (${theme.name})', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         themed(
           SegmentedControl<String>(

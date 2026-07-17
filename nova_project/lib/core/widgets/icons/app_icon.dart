@@ -94,9 +94,7 @@ class _AppIconPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_AppIconPainter old) =>
-      old.type != type ||
-      old.color != color ||
-      old.strokeWidth != strokeWidth;
+      old.type != type || old.color != color || old.strokeWidth != strokeWidth;
 }
 
 /// Builds the 24×24 [Path] for [type]. Circles use [Path.addOval]; arcs use
@@ -127,16 +125,23 @@ Path _pathFor(AppIconType type) {
       // Bell body + clapper.
       final bell = Path()
         ..moveTo(18, 8)
-        ..arcTo(Rect.fromCircle(center: const Offset(12, 8), radius: 6), 0,
-            -math.pi, false)
+        ..arcTo(
+          Rect.fromCircle(center: const Offset(12, 8), radius: 6),
+          0,
+          -math.pi,
+          false,
+        )
         ..cubicTo(6, 15, 3, 17, 3, 17)
         ..lineTo(21, 17)
         ..cubicTo(21, 17, 18, 15, 18, 8);
       final clapper = Path()
         ..moveTo(13.7, 21)
         ..arcTo(
-            Rect.fromCircle(center: const Offset(12, 21), radius: 1.7), 0,
-            math.pi, false);
+          Rect.fromCircle(center: const Offset(12, 21), radius: 1.7),
+          0,
+          math.pi,
+          false,
+        );
       return bell..addPath(clapper, Offset.zero);
     case AppIconType.settings:
       // Sliders: four line stubs + two knob circles.

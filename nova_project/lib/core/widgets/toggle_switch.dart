@@ -7,11 +7,7 @@ import '../theme/app_colors.dart';
 /// 21×21 white knob that slides 3→22 over 200ms. Used by alerts and the
 /// notifications preference.
 class ToggleSwitch extends StatelessWidget {
-  const ToggleSwitch({
-    required this.value,
-    required this.onChanged,
-    super.key,
-  });
+  const ToggleSwitch({required this.value, required this.onChanged, super.key});
 
   final bool value;
   final ValueChanged<bool> onChanged;

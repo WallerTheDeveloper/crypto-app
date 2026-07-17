@@ -24,25 +24,34 @@ void main() {
     forEachTheme((theme) {
       final colors = AppThemes.colorsOf(theme);
 
-      testWidgets('positive → gain / gainSoft / +2.4% (${theme.name})',
-          (tester) async {
-        await tester.pumpWidget(themed(const PriceChangeBadge(2.4), theme: theme));
+      testWidgets('positive → gain / gainSoft / +2.4% (${theme.name})', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          themed(const PriceChangeBadge(2.4), theme: theme),
+        );
         expect(find.text('+2.4%'), findsOneWidget);
         expect(textColor(tester, '+2.4%'), colors.gain);
         expect(badgeBackground(tester), colors.gainSoft);
       });
 
-      testWidgets('negative → loss / lossSoft / -1.2% (${theme.name})',
-          (tester) async {
-        await tester.pumpWidget(themed(const PriceChangeBadge(-1.2), theme: theme));
+      testWidgets('negative → loss / lossSoft / -1.2% (${theme.name})', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          themed(const PriceChangeBadge(-1.2), theme: theme),
+        );
         expect(find.text('-1.2%'), findsOneWidget);
         expect(textColor(tester, '-1.2%'), colors.loss);
         expect(badgeBackground(tester), colors.lossSoft);
       });
 
-      testWidgets('exactly zero → muted / mutedSoft / 0.0% (${theme.name})',
-          (tester) async {
-        await tester.pumpWidget(themed(const PriceChangeBadge(0), theme: theme));
+      testWidgets('exactly zero → muted / mutedSoft / 0.0% (${theme.name})', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          themed(const PriceChangeBadge(0), theme: theme),
+        );
         expect(find.text('0.0%'), findsOneWidget);
         expect(textColor(tester, '0.0%'), colors.muted);
         expect(badgeBackground(tester), colors.mutedSoft);
@@ -50,8 +59,9 @@ void main() {
     });
   });
 
-  testWidgets('label overrides text but colour still follows the sign',
-      (tester) async {
+  testWidgets('label overrides text but colour still follows the sign', (
+    tester,
+  ) async {
     final colors = AppThemes.colorsOf(AppTheme.dark);
     await tester.pumpWidget(
       themed(const PriceChangeBadge(1234, label: r'+$1,234')),

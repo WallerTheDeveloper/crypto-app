@@ -26,8 +26,9 @@ void main() {
     });
   });
 
-  testWidgets('a single point renders nothing but does not throw',
-      (tester) async {
+  testWidgets('a single point renders nothing but does not throw', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       themed(const Sparkline(values: [5], positive: true)),
     );

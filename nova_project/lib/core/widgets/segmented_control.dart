@@ -53,10 +53,12 @@ class SegmentedControl<T> extends StatelessWidget {
     final inset = style == SegmentedStyle.inset;
     final expanded = expand ?? inset;
 
-    final trackRadius =
-        BorderRadius.circular(inset ? AppRadii.control : AppRadii.pill);
-    final segRadius =
-        BorderRadius.circular(inset ? AppRadii.chartBox : AppRadii.pill);
+    final trackRadius = BorderRadius.circular(
+      inset ? AppRadii.control : AppRadii.pill,
+    );
+    final segRadius = BorderRadius.circular(
+      inset ? AppRadii.chartBox : AppRadii.pill,
+    );
     final segPadding = inset
         ? const EdgeInsets.symmetric(vertical: 9)
         : const EdgeInsets.symmetric(vertical: 7, horizontal: 16);

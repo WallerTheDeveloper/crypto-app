@@ -54,7 +54,9 @@ class SecondaryButton extends StatelessWidget {
       ),
     );
 
-    final sized = expand ? SizedBox(width: double.infinity, child: button) : button;
+    final sized = expand
+        ? SizedBox(width: double.infinity, child: button)
+        : button;
     return Opacity(opacity: onPressed == null ? 0.5 : 1, child: sized);
   }
 }

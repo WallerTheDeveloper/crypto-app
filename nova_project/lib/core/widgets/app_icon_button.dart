@@ -28,8 +28,9 @@ class AppIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final radius = BorderRadius.circular(AppRadii.iconButton);
-    final iconColor =
-        accent ? Theme.of(context).colorScheme.onPrimary : colors.text;
+    final iconColor = accent
+        ? Theme.of(context).colorScheme.onPrimary
+        : colors.text;
 
     return Material(
       color: accent ? colors.accent : colors.s1,

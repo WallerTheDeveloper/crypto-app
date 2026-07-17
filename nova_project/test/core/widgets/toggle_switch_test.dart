@@ -7,9 +7,9 @@ import '../../support/widget_harness.dart';
 
 void main() {
   Finder knob() => find.descendant(
-        of: find.byType(AnimatedPositioned),
-        matching: find.byType(Container),
-      );
+    of: find.byType(AnimatedPositioned),
+    matching: find.byType(Container),
+  );
 
   Color trackColor(WidgetTester tester) {
     final track = tester.widget<AnimatedContainer>(
@@ -24,32 +24,39 @@ void main() {
   forEachTheme((theme) {
     final colors = AppThemes.colorsOf(theme);
 
-    testWidgets('off and on map to the two positions and colours (${theme.name})',
-        (tester) async {
-      await tester.pumpWidget(
-        themed(ToggleSwitch(value: false, onChanged: (_) {}), theme: theme),
-      );
-      await tester.pumpAndSettle();
-      expect(
-        tester.widget<AnimatedPositioned>(find.byType(AnimatedPositioned)).left,
-        3,
-      );
-      expect(trackColor(tester), colors.borderStrong);
+    testWidgets(
+      'off and on map to the two positions and colours (${theme.name})',
+      (tester) async {
+        await tester.pumpWidget(
+          themed(ToggleSwitch(value: false, onChanged: (_) {}), theme: theme),
+        );
+        await tester.pumpAndSettle();
+        expect(
+          tester
+              .widget<AnimatedPositioned>(find.byType(AnimatedPositioned))
+              .left,
+          3,
+        );
+        expect(trackColor(tester), colors.borderStrong);
 
-      await tester.pumpWidget(
-        themed(ToggleSwitch(value: true, onChanged: (_) {}), theme: theme),
-      );
-      await tester.pumpAndSettle();
-      expect(
-        tester.widget<AnimatedPositioned>(find.byType(AnimatedPositioned)).left,
-        22,
-      );
-      expect(trackColor(tester), colors.accent);
-    });
+        await tester.pumpWidget(
+          themed(ToggleSwitch(value: true, onChanged: (_) {}), theme: theme),
+        );
+        await tester.pumpAndSettle();
+        expect(
+          tester
+              .widget<AnimatedPositioned>(find.byType(AnimatedPositioned))
+              .left,
+          22,
+        );
+        expect(trackColor(tester), colors.accent);
+      },
+    );
   });
 
-  testWidgets('animates the knob rightward and reports the change',
-      (tester) async {
+  testWidgets('animates the knob rightward and reports the change', (
+    tester,
+  ) async {
     bool value = false;
     await tester.pumpWidget(
       themed(

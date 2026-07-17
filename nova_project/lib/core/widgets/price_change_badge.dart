@@ -78,8 +78,8 @@ class PriceChangeBadge extends StatelessWidget {
     final sign = value > 0
         ? '+'
         : value < 0
-            ? '-'
-            : '';
+        ? '-'
+        : '';
     return '$sign${value.abs().toStringAsFixed(1)}%';
   }
 }

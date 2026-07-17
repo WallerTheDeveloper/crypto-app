@@ -9,10 +9,14 @@ void main() {
   const brand = Color(0xFFF7931A);
 
   forEachTheme((theme) {
-    testWidgets('paints the brand fill and glyph (${theme.name})',
-        (tester) async {
+    testWidgets('paints the brand fill and glyph (${theme.name})', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        themed(const CoinAvatar(color: brand, glyph: '₿'), theme: theme),
+        themed(
+          const CoinAvatar(color: brand, glyph: '₿'),
+          theme: theme,
+        ),
       );
 
       expect(find.text('₿'), findsOneWidget);

@@ -10,12 +10,7 @@ import '../theme/app_colors.dart';
 ///
 /// This must animate: a static grey block is not this component.
 class Skeleton extends StatefulWidget {
-  const Skeleton({
-    this.width,
-    this.height,
-    this.radius = 8,
-    super.key,
-  });
+  const Skeleton({this.width, this.height, this.radius = 8, super.key});
 
   final double? width;
   final double? height;

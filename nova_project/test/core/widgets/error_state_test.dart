@@ -6,8 +6,9 @@ import '../../support/widget_harness.dart';
 
 void main() {
   forEachTheme((theme) {
-    testWidgets('renders title, message and fires Retry (${theme.name})',
-        (tester) async {
+    testWidgets('renders title, message and fires Retry (${theme.name})', (
+      tester,
+    ) async {
       var retried = false;
       await tester.pumpWidget(
         themed(

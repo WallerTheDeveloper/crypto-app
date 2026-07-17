@@ -10,8 +10,9 @@ void main() {
   forEachTheme((theme) {
     final colors = AppThemes.colorsOf(theme);
 
-    testWidgets('surface card uses s1 fill and fires onTap (${theme.name})',
-        (tester) async {
+    testWidgets('surface card uses s1 fill and fires onTap (${theme.name})', (
+      tester,
+    ) async {
       var tapped = false;
       await tester.pumpWidget(
         themed(
@@ -36,8 +37,9 @@ void main() {
     });
   });
 
-  testWidgets('grouped list card puts a divider between rows only',
-      (tester) async {
+  testWidgets('grouped list card puts a divider between rows only', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       themed(
         const GroupedListCard(

@@ -7,8 +7,9 @@ import '../../support/widget_harness.dart';
 
 void main() {
   forEachTheme((theme) {
-    testWidgets('renders title, body and fires the CTA (${theme.name})',
-        (tester) async {
+    testWidgets('renders title, body and fires the CTA (${theme.name})', (
+      tester,
+    ) async {
       var tapped = false;
       await tester.pumpWidget(
         themed(
@@ -25,7 +26,9 @@ void main() {
 
       expect(find.text('Start your portfolio'), findsOneWidget);
       expect(
-        find.text('Add your first holding to track value and profit over time.'),
+        find.text(
+          'Add your first holding to track value and profit over time.',
+        ),
         findsOneWidget,
       );
 

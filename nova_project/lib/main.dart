@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 
 import 'core/constants/hive_boxes.dart';
+import 'core/persistence/box_providers.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_controller.dart';
 import 'core/theme/theme_store.dart';
@@ -21,7 +22,21 @@ Future<void> main() async {
 
   runApp(
     ProviderScope(
-      overrides: [themeStoreProvider.overrideWithValue(themeStore)],
+      overrides: [
+        themeStoreProvider.overrideWithValue(themeStore),
+        // Bind each box provider to its already-open box so the data layer can
+        // reach Hive without touching global state.
+        holdingsBoxProvider.overrideWithValue(
+          Hive.box<dynamic>(HiveBoxes.holdings),
+        ),
+        alertsBoxProvider.overrideWithValue(
+          Hive.box<dynamic>(HiveBoxes.alerts),
+        ),
+        prefsBoxProvider.overrideWithValue(Hive.box<dynamic>(HiveBoxes.prefs)),
+        marketCacheBoxProvider.overrideWithValue(
+          Hive.box<dynamic>(HiveBoxes.marketCache),
+        ),
+      ],
       child: const NovaApp(),
     ),
   );

@@ -11,28 +11,33 @@ import '../../support/widget_harness.dart';
 
 void main() {
   forEachTheme((theme) {
-    testWidgets('primary and secondary buttons fire onPressed (${theme.name})',
-        (tester) async {
-      var primary = 0;
-      var secondary = 0;
-      await tester.pumpWidget(
-        themed(
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              PrimaryButton(label: 'Add', onPressed: () => primary++),
-              SecondaryButton(label: 'Set alert', onPressed: () => secondary++),
-            ],
+    testWidgets(
+      'primary and secondary buttons fire onPressed (${theme.name})',
+      (tester) async {
+        var primary = 0;
+        var secondary = 0;
+        await tester.pumpWidget(
+          themed(
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                PrimaryButton(label: 'Add', onPressed: () => primary++),
+                SecondaryButton(
+                  label: 'Set alert',
+                  onPressed: () => secondary++,
+                ),
+              ],
+            ),
+            theme: theme,
           ),
-          theme: theme,
-        ),
-      );
+        );
 
-      await tester.tap(find.text('Add'));
-      await tester.tap(find.text('Set alert'));
-      expect(primary, 1);
-      expect(secondary, 1);
-    });
+        await tester.tap(find.text('Add'));
+        await tester.tap(find.text('Set alert'));
+        expect(primary, 1);
+        expect(secondary, 1);
+      },
+    );
   });
 
   testWidgets('a null onPressed disables the primary button', (tester) async {
@@ -53,7 +58,9 @@ void main() {
   testWidgets('accent icon button uses the accent fill', (tester) async {
     final colors = AppThemes.colorsOf(AppTheme.dark);
     await tester.pumpWidget(
-      themed(AppIconButton(icon: AppIconType.plus, onPressed: () {}, accent: true)),
+      themed(
+        AppIconButton(icon: AppIconType.plus, onPressed: () {}, accent: true),
+      ),
     );
     final material = tester.widget<Material>(
       find.descendant(
