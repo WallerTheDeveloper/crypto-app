@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  a:hover{opacity:.85}
+  @keyframes shimmer{0%{background-position:-320px 0}100%{background-position:320px 0}}
+  @keyframes drawIn{from{stroke-dashoffset:1400}to{stroke-dashoffset:0}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .scrl::-webkit-scrollbar{width:0;height:0}
+  .scrl{scrollbar-width:none}
+</style>
+</helmet>
+
+<div style="min-height:100%;background:radial-gradient(1200px 700px at 20% -10%, #efeaf8, #e5e2ee 55%, #ddd9e8);padding:32px 28px 64px;display:flex;flex-direction:column;align-items:center;gap:28px">
+
+  <!-- ============ TOOLBAR ============ -->
+  <div style="width:100%;max-width:1120px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#B14BFF,#E8724C);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:17px">◈</div>
+      <div>
+        <div style="font-size:16px;font-weight:600;color:#241d3a;letter-spacing:-.2px">{{ appName }} — crypto dashboard</div>
+        <div style="font-size:12px;color:#6c6488">Interactive prototype · Flutter reference · both themes</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+      <!-- theme toggle -->
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:12px;color:#6c6488">Theme</span>
+        <div style="display:flex;background:#fff;border:1px solid #dcd6ea;border-radius:999px;padding:3px">
+          <button onClick="{{ setThemeA }}" style="{{ tabAStyle }}">A · Dark</button>
+          <button onClick="{{ setThemeB }}" style="{{ tabBStyle }}">B · Warm</button>
+        </div>
+      </div>
+      <!-- state selector -->
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:12px;color:#6c6488">State</span>
+        <div style="display:flex;background:#fff;border:1px solid #dcd6ea;border-radius:999px;padding:3px;gap:2px">
+          <sc-for list="{{ viewStates }}" as="v" hint-placeholder-count="4">
+            <button onClick="{{ v.set }}" style="{{ v.style }}">{{ v.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PHONE ============ -->
+  <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+    <div style="position:relative;width:404px;height:832px;background:#0a0a0f;border-radius:56px;padding:11px;box-shadow:0 40px 90px -30px rgba(40,20,80,.55),0 0 0 2px rgba(255,255,255,.04) inset">
+      <!-- screen -->
+      <div style="{{ themeVars }}">
+        <div class="scrl" style="position:relative;width:100%;height:100%;border-radius:46px;overflow:hidden;background:var(--bg);color:var(--text);display:flex;flex-direction:column">
+
+          <!-- status bar -->
+          <div style="flex:none;height:46px;padding:0 30px 0 34px;display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:600;color:var(--text)">
+            <span>9:41</span>
+            <div style="position:absolute;left:50%;top:11px;transform:translateX(-50%);width:104px;height:30px;background:#0a0a0f;border-radius:16px"></div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4" width="3" height="8" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1" opacity=".4"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".4"/></svg>
+              <svg width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 4.5C4.5 1.5 12.5 1.5 16 4.5M3.5 7C6 5 11 5 13.5 7M6 9.5C7.5 8.5 9.5 8.5 11 9.5"/></svg>
+              <svg width="26" height="13" viewBox="0 0 26 13" fill="none"><rect x="1" y="1" width="21" height="11" rx="3" stroke="currentColor" stroke-width="1.2" opacity=".5"/><rect x="3" y="3" width="15" height="7" rx="1.5" fill="currentColor"/><rect x="23.5" y="4" width="1.8" height="5" rx="1" fill="currentColor" opacity=".5"/></svg>
+            </div>
+          </div>
+
+          <!-- SCROLL AREA -->
+          <div class="scrl" style="flex:1;overflow-y:auto;overflow-x:hidden">
+
+          <!-- ===== MARKET ===== -->
+          <sc-if value="{{ isMarket }}" hint-placeholder-val="{{ true }}">
+            <div style="padding:6px 18px 108px">
+              <!-- header -->
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 2px 14px">
+                <div style="display:flex;align-items:center;gap:9px">
+                  <div style="width:30px;height:30px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:600">◈</div>
+                  <span style="font-size:22px;font-weight:600;letter-spacing:-.4px">{{ appName }}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:14px">
+                  <span style="width:38px;height:38px;border-radius:11px;background:var(--s1);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+                  </span>
+                  <span style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 40%,#000));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:14px">AR</span>
+                </div>
+              </div>
+
+              <sc-if value="{{ stPop }}" hint-placeholder-val="{{ true }}">
+                <!-- portfolio snapshot strip -->
+                <a href="#" onClick="{{ goPortfolio }}" style="display:block;background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:16px 18px;margin-bottom:18px">
+                  <div style="display:flex;align-items:center;justify-content:space-between">
+                    <div>
+                      <div style="font-size:12px;color:var(--muted);margin-bottom:5px">Portfolio value</div>
+                      <div style="font-size:26px;font-weight:500;letter-spacing:-.5px">{{ totalFmt }}</div>
+                    </div>
+                    <div style="text-align:right">
+                      <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Today</div>
+                      <span style="{{ pfBadgeStyle }}">{{ totalPlPctFmt }}</span>
+                    </div>
+                  </div>
+                </a>
+
+                <!-- sort chips -->
+                <div style="display:flex;gap:8px;margin-bottom:14px">
+                  <span style="font-size:13px;font-weight:500;color:#fff;background:var(--accent);padding:7px 14px;border-radius:999px">Market cap</span>
+                  <span style="font-size:13px;color:var(--text);background:var(--s1);border:1px solid var(--border);padding:7px 14px;border-radius:999px">Gainers</span>
+                  <span style="font-size:13px;color:var(--text);background:var(--s1);border:1px solid var(--border);padding:7px 14px;border-radius:999px">Watchlist</span>
+                </div>
+
+                <!-- list -->
+                <div style="display:flex;flex-direction:column">
+                  <sc-for list="{{ marketCoins }}" as="c" hint-placeholder-count="7">
+                    <a href="#" onClick="{{ c.open }}" style="display:flex;align-items:center;gap:13px;height:66px;border-bottom:1px solid var(--border)">
+                      <div style="flex:none;width:40px;height:40px;border-radius:50%;background:{{ c.color }};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:15px">{{ c.glyph }}</div>
+                      <div style="flex:1;min-width:0">
+                        <div style="font-size:15px;font-weight:500">{{ c.name }}</div>
+                        <div style="font-size:12px;color:var(--muted)">{{ c.ticker }}</div>
+                      </div>
+                      <svg width="60" height="24" viewBox="0 0 64 24" fill="none" preserveAspectRatio="none" style="flex:none"><path d="{{ c.spark }}" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="{{ c.sparkStroke }}"/></svg>
+                      <div style="flex:none;text-align:right;min-width:88px">
+                        <div style="font-size:15px;font-weight:500">{{ c.priceFmt }}</div>
+                        <div style="font-size:12px;font-weight:500;{{ c.changeColor }}">{{ c.changeFmt }}</div>
+                      </div>
+                    </a>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <!-- loading -->
+              <sc-if value="{{ stLoading }}" hint-placeholder-val="{{ false }}">
+                <div style="height:74px;border-radius:16px;margin-bottom:18px;{{ skel }}"></div>
+                <div style="display:flex;gap:8px;margin-bottom:16px"><div style="width:96px;height:32px;border-radius:999px;{{ skel }}"></div><div style="width:78px;height:32px;border-radius:999px;{{ skel }}"></div></div>
+                <sc-for list="{{ six }}" as="n" hint-placeholder-count="6">
+                  <div style="display:flex;align-items:center;gap:13px;height:66px;border-bottom:1px solid var(--border)">
+                    <div style="width:40px;height:40px;border-radius:50%;{{ skel }}"></div>
+                    <div style="flex:1"><div style="width:60%;height:13px;border-radius:6px;margin-bottom:8px;{{ skel }}"></div><div style="width:34%;height:11px;border-radius:6px;{{ skel }}"></div></div>
+                    <div style="width:80px;height:26px;border-radius:8px;{{ skel }}"></div>
+                  </div>
+                </sc-for>
+              </sc-if>
+
+              <!-- empty -->
+              <sc-if value="{{ stEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:70px 20px;text-align:center">
+                  <div style="width:64px;height:64px;border-radius:20px;background:var(--s1);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;color:var(--muted)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></div>
+                  <div style="font-size:16px;font-weight:500;margin-bottom:6px">No results</div>
+                  <div style="font-size:14px;color:var(--muted);max-width:230px;margin:0 auto">Try a different coin name or ticker to see live prices.</div>
+                </div>
+              </sc-if>
+
+              <!-- error -->
+              <sc-if value="{{ stError }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:66px 20px;text-align:center">
+                  <div style="width:64px;height:64px;border-radius:20px;background:color-mix(in srgb,var(--loss) 14%,transparent);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;color:var(--loss)"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 8v5M12 16.5v.5"/><circle cx="12" cy="12" r="9"/></svg></div>
+                  <div style="font-size:16px;font-weight:500;margin-bottom:6px">Couldn't load market</div>
+                  <div style="font-size:14px;color:var(--muted);max-width:240px;margin:0 auto 20px">Check your connection and try again.</div>
+                  <button onClick="{{ retry }}" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px 26px;font-size:15px;font-weight:500;font-family:inherit">Retry</button>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <!-- ===== COIN DETAIL ===== -->
+          <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:6px 18px 108px">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0 16px">
+                <button onClick="{{ goBack }}" style="width:38px;height:38px;border-radius:11px;background:var(--s1);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;justify-content:center;font-family:inherit"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+                <div style="display:flex;align-items:center;gap:9px">
+                  <div style="width:26px;height:26px;border-radius:50%;background:{{ sel.color }};display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600">{{ sel.glyph }}</div>
+                  <span style="font-size:16px;font-weight:500">{{ sel.name }}</span>
+                </div>
+                <div style="width:38px"></div>
+              </div>
+
+              <div style="margin-bottom:6px">
+                <div style="font-size:13px;color:var(--muted);margin-bottom:6px">{{ sel.ticker }} · price</div>
+                <div style="display:flex;align-items:flex-end;gap:12px">
+                  <div style="font-size:33px;font-weight:500;letter-spacing:-.5px;line-height:1">{{ sel.priceFmt }}</div>
+                  <span style="{{ sel.badgeStyle }}">{{ sel.changeFmt }}</span>
+                </div>
+              </div>
+
+              <!-- chart -->
+              <div style="margin:22px 0 8px">
+                <svg viewBox="0 0 322 158" width="100%" height="170" preserveAspectRatio="none">
+                  <defs><linearGradient id="cgrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{{ sel.fill0 }}"/><stop offset="1" stop-color="{{ sel.fill1 }}"/></linearGradient></defs>
+                  <path d="{{ chartArea }}" fill="url(#cgrad)"/>
+                  <path d="{{ chartLine }}" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1400" style="{{ chartStroke }};animation:drawIn 1.1s ease forwards"/>
+                </svg>
+              </div>
+
+              <!-- range toggle -->
+              <div style="display:flex;background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:4px;gap:3px;margin-bottom:22px">
+                <sc-for list="{{ ranges }}" as="r" hint-placeholder-count="4">
+                  <button onClick="{{ r.set }}" style="{{ r.style }}">{{ r.label }}</button>
+                </sc-for>
+              </div>
+
+              <!-- stats grid -->
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px">
+                <sc-for list="{{ sel.stats }}" as="s" hint-placeholder-count="4">
+                  <div style="background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:15px 16px">
+                    <div style="font-size:12px;color:var(--muted);margin-bottom:7px">{{ s.label }}</div>
+                    <div style="font-size:16px;font-weight:500">{{ s.val }}</div>
+                  </div>
+                </sc-for>
+              </div>
+
+              <!-- actions -->
+              <div style="display:flex;gap:12px">
+                <button onClick="{{ addHolding }}" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:15px;font-size:15px;font-weight:500;font-family:inherit">Add to portfolio</button>
+                <button onClick="{{ openAlertSheet }}" style="flex:1;background:transparent;color:var(--text);border:1px solid var(--border-strong);border-radius:12px;padding:15px;font-size:15px;font-weight:500;font-family:inherit">Set alert</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ===== PORTFOLIO ===== -->
+          <sc-if value="{{ isPortfolio }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:6px 18px 108px">
+              <div style="padding:8px 2px 18px"><span style="font-size:22px;font-weight:600;letter-spacing:-.4px">Portfolio</span></div>
+
+              <sc-if value="{{ stPop }}" hint-placeholder-val="{{ true }}">
+                <!-- HERO -->
+                <div style="text-align:center;padding:12px 0 8px;animation:fadeUp .5s ease both">
+                  <div style="font-size:13px;color:var(--muted);margin-bottom:8px">Total value</div>
+                  <div style="font-size:44px;font-weight:500;letter-spacing:-1px;line-height:1;margin-bottom:14px">{{ totalFmt }}</div>
+                  <div style="display:inline-flex;align-items:center;gap:8px">
+                    <span style="{{ pfBadgeStyle }}">{{ totalPlFmt }}</span>
+                    <span style="{{ pfBadgeStyle }}">{{ totalPlPctFmt }}</span>
+                    <span style="font-size:13px;color:var(--muted)">all time</span>
+                  </div>
+                </div>
+
+                <!-- donut + legend -->
+                <div style="display:flex;align-items:center;gap:20px;background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:18px;margin:22px 0 20px">
+                  <div style="position:relative;flex:none;width:128px;height:128px">
+                    <svg width="128" height="128" viewBox="0 0 128 128">
+                      <circle cx="64" cy="64" r="52" fill="none" stroke="var(--border)" stroke-width="18"/>
+                      <sc-for list="{{ donutSegs }}" as="d" hint-placeholder-count="4">
+                        <circle cx="64" cy="64" r="52" fill="none" stroke="{{ d.color }}" stroke-width="18" stroke-linecap="butt" stroke-dasharray="{{ d.dash }}" stroke-dashoffset="{{ d.offset }}" transform="rotate(-90 64 64)"/>
+                      </sc-for>
+                    </svg>
+                    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                      <div style="font-size:20px;font-weight:500;letter-spacing:-.3px">{{ holdingCount }}</div>
+                      <div style="font-size:11px;color:var(--muted)">assets</div>
+                    </div>
+                  </div>
+                  <div style="flex:1;display:flex;flex-direction:column;gap:11px">
+                    <sc-for list="{{ portfolio }}" as="h" hint-placeholder-count="4">
+                      <div style="display:flex;align-items:center;gap:9px">
+                        <span style="width:10px;height:10px;border-radius:3px;background:{{ h.color }};flex:none"></span>
+                        <span style="font-size:13px;flex:1">{{ h.ticker }}</span>
+                        <span style="font-size:13px;color:var(--muted)">{{ h.allocFmt }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+
+                <!-- holdings -->
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                  <span style="font-size:16px;font-weight:500">Holdings</span>
+                  <button onClick="{{ addHolding2 }}" style="background:transparent;border:none;color:var(--accent);font-size:14px;font-weight:500;font-family:inherit;display:flex;align-items:center;gap:5px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add</button>
+                </div>
+                <div style="display:flex;flex-direction:column">
+                  <sc-for list="{{ portfolio }}" as="h" hint-placeholder-count="4">
+                    <div style="display:flex;align-items:center;gap:13px;height:70px;border-bottom:1px solid var(--border)">
+                      <div style="flex:none;width:40px;height:40px;border-radius:50%;background:{{ h.color }};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:15px">{{ h.glyph }}</div>
+                      <div style="flex:1;min-width:0">
+                        <div style="font-size:15px;font-weight:500">{{ h.name }}</div>
+                        <div style="font-size:12px;color:var(--muted)">{{ h.amountFmt }}</div>
+                      </div>
+                      <div style="flex:none;text-align:right">
+                        <div style="font-size:15px;font-weight:500">{{ h.valueFmt }}</div>
+                        <div style="font-size:12px;font-weight:500;{{ h.plColor }}">{{ h.plFmt }}</div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <!-- loading -->
+              <sc-if value="{{ stLoading }}" hint-placeholder-val="{{ false }}">
+                <div style="height:120px;border-radius:16px;margin:12px 0 22px;{{ skel }}"></div>
+                <div style="height:128px;border-radius:16px;margin-bottom:22px;{{ skel }}"></div>
+                <sc-for list="{{ four }}" as="n" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:13px;height:70px;border-bottom:1px solid var(--border)"><div style="width:40px;height:40px;border-radius:50%;{{ skel }}"></div><div style="flex:1"><div style="width:55%;height:13px;border-radius:6px;margin-bottom:8px;{{ skel }}"></div><div style="width:30%;height:11px;border-radius:6px;{{ skel }}"></div></div><div style="width:70px;height:26px;border-radius:8px;{{ skel }}"></div></div>
+                </sc-for>
+              </sc-if>
+
+              <!-- empty -->
+              <sc-if value="{{ stEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:64px 22px;text-align:center">
+                  <div style="width:74px;height:74px;border-radius:22px;background:color-mix(in srgb,var(--accent) 12%,transparent);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;color:var(--accent)"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9v9z"/><path d="M12 3a9 9 0 0 1 9 9h-9z" opacity=".5"/></svg></div>
+                  <div style="font-size:18px;font-weight:500;margin-bottom:8px">Start your portfolio</div>
+                  <div style="font-size:14px;color:var(--muted);max-width:250px;margin:0 auto 24px">Add your first holding to track value and profit over time.</div>
+                  <button onClick="{{ addHolding }}" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:15px;font-weight:500;font-family:inherit">Add your first holding</button>
+                </div>
+              </sc-if>
+
+              <!-- error -->
+              <sc-if value="{{ stError }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:64px 22px;text-align:center">
+                  <div style="width:64px;height:64px;border-radius:20px;background:color-mix(in srgb,var(--loss) 14%,transparent);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;color:var(--loss)"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 8v5M12 16.5v.5"/><circle cx="12" cy="12" r="9"/></svg></div>
+                  <div style="font-size:16px;font-weight:500;margin-bottom:6px">Couldn't sync portfolio</div>
+                  <div style="font-size:14px;color:var(--muted);max-width:240px;margin:0 auto 20px">Your holdings are safe. Try syncing again.</div>
+                  <button onClick="{{ retry }}" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px 26px;font-size:15px;font-weight:500;font-family:inherit">Retry</button>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <!-- ===== ALERTS ===== -->
+          <sc-if value="{{ isAlerts }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:6px 18px 108px">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 2px 18px">
+                <span style="font-size:22px;font-weight:600;letter-spacing:-.4px">Alerts</span>
+                <button onClick="{{ openAlertSheet }}" style="width:38px;height:38px;border-radius:11px;background:var(--accent);border:none;color:#fff;display:flex;align-items:center;justify-content:center;font-family:inherit"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+              </div>
+
+              <sc-if value="{{ alertsShow }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;flex-direction:column;gap:12px">
+                  <sc-for list="{{ alerts }}" as="a" hint-placeholder-count="3">
+                    <div style="display:flex;align-items:center;gap:13px;background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:15px 16px">
+                      <div style="flex:none;width:40px;height:40px;border-radius:50%;background:{{ a.color }};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:15px">{{ a.glyph }}</div>
+                      <div style="flex:1;min-width:0">
+                        <div style="font-size:15px;font-weight:500">{{ a.name }}</div>
+                        <div style="font-size:13px;color:var(--muted)">{{ a.cond }}</div>
+                      </div>
+                      <button onClick="{{ a.toggle }}" style="{{ a.switchTrack }}"><span style="{{ a.switchKnob }}"></span></button>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ alertsEmpty }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:64px 22px;text-align:center">
+                  <div style="width:74px;height:74px;border-radius:22px;background:color-mix(in srgb,var(--accent) 12%,transparent);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;color:var(--accent)"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+                  <div style="font-size:18px;font-weight:500;margin-bottom:8px">No alerts yet</div>
+                  <div style="font-size:14px;color:var(--muted);max-width:250px;margin:0 auto 24px">Get notified the moment a coin crosses a price you care about.</div>
+                  <button onClick="{{ openAlertSheet }}" style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:15px;font-weight:500;font-family:inherit">Create an alert</button>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <!-- ===== SETTINGS ===== -->
+          <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:6px 18px 108px">
+              <div style="padding:8px 2px 18px"><span style="font-size:22px;font-weight:600;letter-spacing:-.4px">Settings</span></div>
+
+              <div style="display:flex;align-items:center;gap:14px;background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:16px 18px;margin-bottom:22px">
+                <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 40%,#000));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:19px">AR</div>
+                <div style="flex:1"><div style="font-size:16px;font-weight:500">Alex Rivera</div><div style="font-size:13px;color:var(--muted)">alex@example.com</div></div>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+              </div>
+
+              <!-- theme -->
+              <div style="font-size:13px;color:var(--muted);margin:0 4px 10px">Appearance</div>
+              <div style="background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:16px 18px;margin-bottom:22px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+                  <span style="font-size:15px">Theme</span>
+                  <div style="display:flex;background:var(--s2);border:1px solid var(--border);border-radius:999px;padding:3px">
+                    <button onClick="{{ setThemeA }}" style="{{ inThemeA }}">Dark</button>
+                    <button onClick="{{ setThemeB }}" style="{{ inThemeB }}">Warm</button>
+                  </div>
+                </div>
+                <div style="display:flex;gap:10px">
+                  <button onClick="{{ setThemeA }}" style="{{ swatchA }}"><span style="display:flex;gap:5px"><span style="width:16px;height:16px;border-radius:5px;background:#0D0B1A;border:1px solid #2A2247"></span><span style="width:16px;height:16px;border-radius:5px;background:#B14BFF"></span><span style="width:16px;height:16px;border-radius:5px;background:#00F5A0"></span></span><span style="font-size:12px;color:var(--text)">A · Dark vibrant</span></button>
+                  <button onClick="{{ setThemeB }}" style="{{ swatchB }}"><span style="display:flex;gap:5px"><span style="width:16px;height:16px;border-radius:5px;background:#FFF7F0;border:1px solid #E8D5C4"></span><span style="width:16px;height:16px;border-radius:5px;background:#E8724C"></span><span style="width:16px;height:16px;border-radius:5px;background:#1D9E75"></span></span><span style="font-size:12px;color:var(--text)">B · Warm playful</span></button>
+                </div>
+              </div>
+
+              <!-- prefs -->
+              <div style="font-size:13px;color:var(--muted);margin:0 4px 10px">Preferences</div>
+              <div style="background:var(--s1);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:22px">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border)">
+                  <span style="font-size:15px">Currency</span>
+                  <div style="display:flex;background:var(--s2);border:1px solid var(--border);border-radius:999px;padding:3px">
+                    <button onClick="{{ setUsd }}" style="{{ curUsd }}">USD</button>
+                    <button onClick="{{ setEur }}" style="{{ curEur }}">EUR</button>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px">
+                  <div><div style="font-size:15px">Notifications</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Price alerts &amp; news</div></div>
+                  <button onClick="{{ toggleNotif }}" style="{{ notifTrack }}"><span style="{{ notifKnob }}"></span></button>
+                </div>
+              </div>
+
+              <div style="background:var(--s1);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+                <div style="padding:16px 18px;border-bottom:1px solid var(--border);font-size:15px">Account &amp; security</div>
+                <div style="padding:16px 18px;border-bottom:1px solid var(--border);font-size:15px">Help &amp; support</div>
+                <div onClick="{{ signOut }}" style="padding:16px 18px;font-size:15px;color:var(--loss);cursor:pointer">Sign out</div>
+              </div>
+            </div>
+          </sc-if>
+
+          </div><!-- /scroll -->
+
+          <!-- BOTTOM NAV -->
+          <div style="flex:none;position:absolute;bottom:0;left:0;right:0;height:84px;background:color-mix(in srgb,var(--s1) 92%,transparent);backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;padding:10px 8px 24px">
+            <sc-for list="{{ navs }}" as="n" hint-placeholder-count="4">
+              <button onClick="{{ n.go }}" style="flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:4px;font-family:inherit;{{ n.color }}">
+                <span style="{{ n.iconStyle }}" dangerouslySetInnerHTML="{{ n.iconHtml }}"></span>
+                <span style="font-size:11px;font-weight:500">{{ n.label }}</span>
+              </button>
+            </sc-for>
+          </div>
+
+          <!-- SHEET -->
+          <sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ closeSheet }}" style="position:absolute;inset:0;background:rgba(5,3,15,.45);z-index:20"></div>
+            <div style="position:absolute;left:0;right:0;bottom:0;z-index:21;background:var(--s2);border-radius:26px 26px 0 0;border-top:1px solid var(--border-strong);padding:8px 20px 30px;animation:fadeUp .3s ease both">
+              <div style="width:40px;height:5px;border-radius:3px;background:var(--border-strong);margin:6px auto 18px"></div>
+              <div style="font-size:18px;font-weight:600;margin-bottom:4px">{{ sheetTitle }}</div>
+              <div style="font-size:13px;color:var(--muted);margin-bottom:20px">{{ sheetSub }}</div>
+
+              <div style="display:flex;align-items:center;gap:12px;background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:13px 15px;margin-bottom:14px">
+                <div style="width:36px;height:36px;border-radius:50%;background:{{ sel.color }};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:14px">{{ sel.glyph }}</div>
+                <div style="flex:1"><div style="font-size:15px;font-weight:500">{{ sel.name }}</div><div style="font-size:12px;color:var(--muted)">{{ sel.priceFmt }}</div></div>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+              </div>
+
+              <sc-if value="{{ sheetIsAlert }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;gap:10px;margin-bottom:14px">
+                  <button style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:500;font-family:inherit">Above</button>
+                  <button style="flex:1;background:transparent;color:var(--text);border:1px solid var(--border-strong);border-radius:12px;padding:13px;font-size:14px;font-weight:500;font-family:inherit">Below</button>
+                </div>
+              </sc-if>
+
+              <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:13px 15px;margin-bottom:20px">
+                <div style="font-size:12px;color:var(--muted);margin-bottom:5px">{{ sheetFieldLabel }}</div>
+                <div style="font-size:22px;font-weight:500;letter-spacing:-.3px">{{ sheetFieldValue }}</div>
+              </div>
+
+              <button onClick="{{ confirmSheet }}" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:15px;font-size:15px;font-weight:500;font-family:inherit">{{ sheetCta }}</button>
+            </div>
+          </sc-if>
+
+          <!-- TOAST -->
+          <sc-if value="{{ toastShow }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;bottom:100px;left:50%;transform:translateX(-50%);z-index:30;background:var(--s2);border:1px solid var(--border-strong);color:var(--text);border-radius:14px;padding:12px 18px;display:flex;align-items:center;gap:10px;box-shadow:0 12px 30px -10px rgba(0,0,0,.5);animation:toastIn .3s ease both;white-space:nowrap">
+              <span style="width:22px;height:22px;border-radius:50%;background:var(--gain);display:flex;align-items:center;justify-content:center;flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 6"/></svg></span>
+              <span style="font-size:14px;font-weight:500">{{ toastMsg }}</span>
+            </div>
+          </sc-if>
+
+        </div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:#6c6488">Tap coins to open detail · bottom nav switches screens · toggle theme &amp; state above</div>
+  </div>
+
+  <!-- ============ COMPONENT BOARD ============ -->
+  <div style="width:100%;max-width:1120px;margin-top:14px">
+    <div style="font-size:16px;font-weight:600;color:#241d3a;margin-bottom:4px">Component sheet</div>
+    <div style="font-size:13px;color:#6c6488;margin-bottom:18px">Reusable pieces rendered in both themes — same structure, tokens only change.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+
+      <!-- THEME A PANEL -->
+      <div style="--bg:#0D0B1A;--s1:#16122B;--s2:#1E1838;--border:#2A2247;--border-strong:#3A3157;--text:#F0EDFF;--muted:#9B8CE0;--accent:#B14BFF;--gain:#00F5A0;--loss:#FF5C7A;background:var(--bg);border-radius:20px;padding:22px;color:var(--text)">
+        <div style="font-size:13px;font-weight:600;margin-bottom:16px;color:var(--muted)">THEME A · DARK VIBRANT</div>
+        <div dangerouslySetInnerHTML="{{ boardHtmlObj }}"></div>
+      </div>
+
+      <!-- THEME B PANEL -->
+      <div style="--bg:#FFF7F0;--s1:#FFFFFF;--s2:#FFFCF8;--border:#F2E2D4;--border-strong:#E8D5C4;--text:#3A2A1E;--muted:#B08968;--accent:#E8724C;--gain:#1D9E75;--loss:#E24B4A;background:var(--bg);border:1px solid #F2E2D4;border-radius:20px;padding:22px;color:var(--text)">
+        <div style="font-size:13px;font-weight:600;margin-bottom:16px;color:var(--muted)">THEME B · WARM PLAYFUL</div>
+        <div dangerouslySetInnerHTML="{{ boardHtmlObj }}"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180,&quot;height&quot;:1500},&quot;appName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Nova&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Branding&quot;},&quot;initialTheme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;A&quot;,&quot;B&quot;],&quot;default&quot;:&quot;A&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Branding&quot;}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.state = {
+      theme: (props && props.initialTheme) || 'A',
+      screen: 'market',
+      coinId: 'btc',
+      range: '7d',
+      sheet: null,
+      viewState: 'populated',
+      notif: true,
+      currency: 'USD',
+      toast: null,
+      alertOn: { a1:true, a2:false, a3:true }
+    };
+  }
+
+  THEMES = {
+    A: {'--bg':'#0D0B1A','--s1':'#16122B','--s2':'#1E1838','--border':'#2A2247','--border-strong':'#3A3157','--text':'#F0EDFF','--muted':'#9B8CE0','--accent':'#B14BFF','--gain':'#00F5A0','--loss':'#FF5C7A'},
+    B: {'--bg':'#FFF7F0','--s1':'#FFFFFF','--s2':'#FFFCF8','--border':'#F2E2D4','--border-strong':'#E8D5C4','--text':'#3A2A1E','--muted':'#B08968','--accent':'#E8724C','--gain':'#1D9E75','--loss':'#E24B4A'}
+  };
+
+  COINS = [
+    {id:'btc',name:'Bitcoin',ticker:'BTC',glyph:'₿',price:64210.33,change:2.4,color:'#F7931A',supply:19.72e6,ath:73800,vol:28.4e9,spark:[3,4,3.5,5,4.5,6,5.5,7,6.5,8,7.5,9]},
+    {id:'eth',name:'Ethereum',ticker:'ETH',glyph:'Ξ',price:3125.88,change:-1.2,color:'#627EEA',supply:120.3e6,ath:4878,vol:14.1e9,spark:[8,7.5,8,6.5,7,6,6.5,5,5.5,4.5,5,4]},
+    {id:'sol',name:'Solana',ticker:'SOL',glyph:'S',price:148.22,change:5.6,color:'#14B8A6',supply:462e6,ath:260,vol:3.2e9,spark:[2,3,2.5,4,5,4.5,6,7,6.5,8,9,10]},
+    {id:'xrp',name:'XRP',ticker:'XRP',glyph:'X',price:0.5821,change:-0.4,color:'#3B4A54',supply:55.1e9,ath:3.84,vol:1.8e9,spark:[6,5.8,6,5.5,5.7,5.4,5.6,5.2,5.4,5,5.2,4.9]},
+    {id:'ada',name:'Cardano',ticker:'ADA',glyph:'A',price:0.446,change:1.1,color:'#0F5FE0',supply:35.6e9,ath:3.09,vol:0.62e9,spark:[4,4.2,4,4.5,4.3,4.8,4.6,5,4.9,5.3,5.1,5.5]},
+    {id:'doge',name:'Dogecoin',ticker:'DOGE',glyph:'Ð',price:0.1523,change:8.3,color:'#C2A633',supply:143e9,ath:0.73,vol:1.1e9,spark:[2,2.5,3,2.8,3.5,4,3.8,5,6,5.5,7,8]},
+    {id:'avax',name:'Avalanche',ticker:'AVAX',glyph:'A',price:36.74,change:-2.7,color:'#E84142',supply:396e6,ath:146,vol:0.44e9,spark:[9,8.5,8.8,8,8.3,7.5,7.8,7,7.3,6.5,6.8,6]},
+    {id:'link',name:'Chainlink',ticker:'LINK',glyph:'L',price:14.82,change:3.2,color:'#2A5ADA',supply:617e6,ath:52.7,vol:0.51e9,spark:[3,3.5,3.2,4,3.8,4.5,4.3,5,4.8,5.5,5.3,6]}
+  ];
+
+  HOLD = [
+    {id:'btc',amount:0.42,avg:52000},
+    {id:'eth',amount:3.1,avg:2760},
+    {id:'sol',amount:24,avg:96},
+    {id:'link',amount:120,avg:11.4}
+  ];
+
+  ALERTS = [
+    {key:'a1',id:'btc',dir:'above',price:70000},
+    {key:'a2',id:'eth',dir:'below',price:2800},
+    {key:'a3',id:'sol',dir:'above',price:160}
+  ];
+
+  // ---- helpers ----
+  hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+  rng(seed){let t=seed>>>0;return()=>{t=(t+0x6D2B79F5)>>>0;let r=Math.imul(t^(t>>>15),1|t);r=(r+Math.imul(r^(r>>>7),61|r))^r;return((r^(r>>>14))>>>0)/4294967296;};}
+  series(id,range){const n={'24h':30,'7d':40,'30d':44,'1y':48}[range]||40;const r=this.rng(this.hash(id+range));const c=this.COINS.find(x=>x.id===id);const trend=((c?c.change:0)/100)*3/n;const a=[];let v=0.5;for(let i=0;i<n;i++){v+=(r()-0.5)*0.11+trend;a.push(v);}return a;}
+  path(vals,w,h,pad){const mn=Math.min(...vals),mx=Math.max(...vals),sp=(mx-mn)||1,n=vals.length;
+    const p=vals.map((v,i)=>({x:pad+i/(n-1)*(w-2*pad),y:pad+(1-(v-mn)/sp)*(h-2*pad)}));
+    let d=`M ${p[0].x.toFixed(1)} ${p[0].y.toFixed(1)}`;
+    for(let i=0;i<p.length-1;i++){const p0=p[i-1]||p[i],p1=p[i],p2=p[i+1],p3=p[i+2]||p2;
+      const c1x=p1.x+(p2.x-p0.x)/6,c1y=p1.y+(p2.y-p0.y)/6,c2x=p2.x-(p3.x-p1.x)/6,c2y=p2.y-(p3.y-p1.y)/6;
+      d+=` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}, ${c2x.toFixed(1)} ${c2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;}
+    const area=d+` L ${p[n-1].x.toFixed(1)} ${h} L ${p[0].x.toFixed(1)} ${h} Z`;
+    return {line:d,area};}
+  rate(){return this.state.currency==='EUR'?0.92:1;}
+  sym(){return this.state.currency==='EUR'?'€':'$';}
+  fmt(n){const x=n*this.rate();let d;const a=Math.abs(x);
+    if(a>=1000)d=x.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+    else if(a>=1)d=x.toFixed(2);else d=x.toFixed(4);return this.sym()+d;}
+  big(n){const x=n*this.rate();if(x>=1e9)return this.sym()+(x/1e9).toFixed(2)+'B';if(x>=1e6)return this.sym()+(x/1e6).toFixed(2)+'M';if(x>=1e3)return this.sym()+(x/1e3).toFixed(2)+'K';return this.sym()+x.toFixed(2);}
+  compact(n){if(n>=1e9)return(n/1e9).toFixed(2)+'B';if(n>=1e6)return(n/1e6).toFixed(2)+'M';return n.toLocaleString('en-US');}
+
+  set(o){this.setState(o);}
+  toast(msg){this.setState({toast:msg});clearTimeout(this._t);this._t=setTimeout(()=>this.setState({toast:null}),2200);}
+
+  ICONS = {
+    market:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-5 3.5 3.5L20 7"/><path d="M15 7h5v5"/></svg>',
+    portfolio:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9v9z"/><path d="M12 3a9 9 0 0 1 9 9h-9z"/></svg>',
+    alerts:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>',
+    settings:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h9M18 8h1M5 16h1M10 16h9"/><circle cx="16" cy="8" r="2.3"/><circle cx="8" cy="16" r="2.3"/></svg>'
+  };
+
+  seg(active,accentText){return `font-family:inherit;border:none;cursor:pointer;font-size:13px;font-weight:500;padding:7px 15px;border-radius:999px;transition:all .15s;`+
+    (active?`background:var(--accent);color:#fff;`:`background:transparent;color:var(--muted);`);}
+  tSeg(active){return `font-family:inherit;border:none;cursor:pointer;white-space:nowrap;font-size:13px;font-weight:500;padding:7px 16px;border-radius:999px;transition:all .15s;`+
+    (active?`background:#241d3a;color:#fff;`:`background:transparent;color:#6c6488;`);}
+
+  renderVals(){
+    const s=this.state, t=this.THEMES[s.theme];
+    const themeVars={display:'contents'}; for(const k in t)themeVars[k]=t[k];
+    const badge=(up)=>`display:inline-flex;align-items:center;font-size:12px;font-weight:500;padding:4px 9px;border-radius:999px;color:${up?'var(--gain)':'var(--loss)'};background:color-mix(in srgb, ${up?'var(--gain)':'var(--loss)'} 15%, transparent)`;
+    const bigBadge=(up)=>`display:inline-flex;align-items:center;font-size:14px;font-weight:500;padding:6px 12px;border-radius:999px;color:${up?'var(--gain)':'var(--loss)'};background:color-mix(in srgb, ${up?'var(--gain)':'var(--loss)'} 15%, transparent)`;
+
+    // market
+    const marketCoins=this.COINS.map(c=>{const up=c.change>=0;return {
+      ...c,
+      priceFmt:this.fmt(c.price),
+      changeFmt:(up?'+':'')+c.change.toFixed(1)+'%',
+      changeColor:`color:${up?'var(--gain)':'var(--loss)'}`,
+      sparkStroke:`stroke:${up?'var(--gain)':'var(--loss)'}`,
+      spark:this.path(c.spark,64,24,3).line,
+      open:()=>this.set({screen:'detail',coinId:c.id})
+    };});
+
+    // detail
+    const c=this.COINS.find(x=>x.id===s.coinId)||this.COINS[0];
+    const up=c.change>=0;
+    const ser=this.series(c.id,s.range);
+    const cp=this.path(ser,322,150,10);
+    const sel={...c,priceFmt:this.fmt(c.price),changeFmt:(up?'+':'')+c.change.toFixed(1)+'%',
+      badgeStyle:bigBadge(up),
+      fill0:up?'color-mix(in srgb, var(--gain) 34%, transparent)':'color-mix(in srgb, var(--loss) 34%, transparent)',
+      fill1:'transparent',
+      stats:[
+        {label:'Market cap',val:this.big(c.price*c.supply)},
+        {label:'24h volume',val:this.big(c.vol)},
+        {label:'Circulating supply',val:this.compact(c.supply)+' '+c.ticker},
+        {label:'All-time high',val:this.fmt(c.ath)}
+      ]};
+    const chartStroke=`stroke:${up?'var(--gain)':'var(--loss)'}`;
+
+    const ranges=['24h','7d','30d','1y'].map(r=>({label:r,set:()=>this.set({range:r}),
+      style:`font-family:inherit;border:none;cursor:pointer;flex:1;font-size:13px;font-weight:500;padding:9px;border-radius:9px;transition:all .15s;`+
+        (s.range===r?`background:var(--accent);color:#fff;`:`background:transparent;color:var(--muted);`)}));
+
+    // portfolio
+    const holds=this.HOLD.map(h=>{const co=this.COINS.find(x=>x.id===h.id);const value=h.amount*co.price;const cost=h.amount*h.avg;const pl=value-cost;const pu=pl>=0;
+      return {...co,amount:h.amount,value,pl,plPct:pl/cost*100,pu,
+        amountFmt:h.amount+' '+co.ticker,valueFmt:this.fmt(value),
+        plFmt:(pu?'+':'')+this.fmt(Math.abs(pl))+' ('+(pu?'+':'-')+Math.abs(pl/cost*100).toFixed(1)+'%)',
+        plColor:`color:${pu?'var(--gain)':'var(--loss)'}`};});
+    const total=holds.reduce((a,h)=>a+h.value,0);
+    const totalCost=this.HOLD.reduce((a,h)=>a+h.amount*h.avg,0);
+    const totalPl=total-totalCost, tu=totalPl>=0;
+    const circ=2*Math.PI*52; let acc=0;
+    const donutSegs=holds.map(h=>{const frac=h.value/total;const dash=frac*circ;const seg={color:h.color,dash:`${(dash-2).toFixed(1)} ${(circ-dash+2).toFixed(1)}`,offset:(-acc).toFixed(1)};acc+=dash;return seg;});
+    const portfolio=holds.map(h=>({...h,allocFmt:(h.value/total*100).toFixed(0)+'%'}));
+
+    // alerts
+    const alerts=this.ALERTS.map(a=>{const co=this.COINS.find(x=>x.id===a.id);const on=s.alertOn[a.key];
+      return {...co,cond:`When price goes ${a.dir} ${this.fmt(a.price)}`,
+        toggle:()=>this.setState(st=>({alertOn:{...st.alertOn,[a.key]:!st.alertOn[a.key]}})),
+        switchTrack:`position:relative;width:46px;height:27px;border-radius:999px;border:none;cursor:pointer;flex:none;transition:background .2s;background:${on?'var(--accent)':'var(--border-strong)'}`,
+        switchKnob:`position:absolute;top:3px;left:${on?'22px':'3px'};width:21px;height:21px;border-radius:50%;background:#fff;transition:left .2s`};});
+
+    // nav
+    const navs=['market','portfolio','alerts','settings'].map(k=>{const on=s.screen===k||(k==='market'&&s.screen==='detail');
+      return {label:k.charAt(0).toUpperCase()+k.slice(1),iconHtml:{__html:this.ICONS[k]},go:()=>this.set({screen:k}),
+        color:`color:${on?'var(--accent)':'var(--muted)'}`,
+        iconStyle:`display:flex;align-items:center;justify-content:center;height:24px`};});
+
+    // settings toggles
+    const notifTrack=`position:relative;width:46px;height:27px;border-radius:999px;border:none;cursor:pointer;transition:background .2s;background:${s.notif?'var(--accent)':'var(--border-strong)'}`;
+    const notifKnob=`position:absolute;top:3px;left:${s.notif?'22px':'3px'};width:21px;height:21px;border-radius:50%;background:#fff;transition:left .2s`;
+    const inSeg=(active)=>`font-family:inherit;border:none;cursor:pointer;font-size:13px;font-weight:500;padding:7px 16px;border-radius:999px;transition:all .15s;`+(active?`background:var(--accent);color:#fff;`:`background:transparent;color:var(--muted);`);
+    const swatch=(active)=>`flex:1;display:flex;flex-direction:column;gap:9px;align-items:flex-start;font-family:inherit;cursor:pointer;background:var(--s2);border-radius:12px;padding:13px;text-align:left;border:1.5px solid ${active?'var(--accent)':'var(--border)'}`;
+
+    // toolbar
+    const viewStates=[['populated','Populated'],['loading','Loading'],['empty','Empty'],['error','Error']].map(([k,label])=>({
+      label,set:()=>this.set({viewState:k}),
+      style:`font-family:inherit;border:none;cursor:pointer;font-size:12px;font-weight:500;padding:6px 11px;border-radius:999px;transition:all .15s;`+
+        (s.viewState===k?`background:#241d3a;color:#fff;`:`background:transparent;color:#6c6488;`)}));
+
+    // sheet
+    const sheetIsAlert=s.sheet==='alert';
+    const sheetTitle=sheetIsAlert?'Set price alert':'Add holding';
+    const sheetSub=sheetIsAlert?'Notify me when the price crosses a target.':'Enter how much '+sel.name+' you own.';
+    const sheetFieldLabel=sheetIsAlert?'Target price':'Amount ('+sel.ticker+')';
+    const sheetFieldValue=sheetIsAlert?this.fmt(Math.round(c.price*1.1)):'0.00';
+    const sheetCta=sheetIsAlert?'Create alert':'Add to portfolio';
+
+    // component board html (single string, both panels reuse; colors via inherited vars)
+    const boardHtml=`
+      <div style="display:flex;flex-direction:column;gap:18px;font-family:inherit">
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Buttons</div>
+          <div style="display:flex;gap:10px">
+            <button style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:500;font-family:inherit">Primary</button>
+            <button style="flex:1;background:transparent;color:var(--text);border:1px solid var(--border-strong);border-radius:12px;padding:12px;font-size:14px;font-weight:500;font-family:inherit">Secondary</button>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Price-change badges</div>
+          <div style="display:flex;gap:8px">
+            <span style="${badge(true)}">+2.4%</span>
+            <span style="${badge(false)}">-1.2%</span>
+            <span style="font-size:12px;font-weight:500;padding:4px 9px;border-radius:999px;color:var(--muted);background:color-mix(in srgb,var(--muted) 15%,transparent)">0.0%</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Coin list row</div>
+          <div style="display:flex;align-items:center;gap:12px;background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:12px 14px">
+            <div style="width:38px;height:38px;border-radius:50%;background:#F7931A;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600">₿</div>
+            <div style="flex:1"><div style="font-size:14px;font-weight:500;color:var(--text)">Bitcoin</div><div style="font-size:12px;color:var(--muted)">BTC</div></div>
+            <svg width="52" height="22" viewBox="0 0 64 24" preserveAspectRatio="none"><path d="${this.path(this.COINS[0].spark,64,24,3).line}" fill="none" stroke-width="2" style="stroke:var(--gain)"/></svg>
+            <div style="text-align:right"><div style="font-size:14px;font-weight:500;color:var(--text)">$64,210</div><div style="font-size:12px;font-weight:500;color:var(--gain)">+2.4%</div></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px">
+          <div style="flex:1">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Stat card</div>
+            <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:14px"><div style="font-size:11px;color:var(--muted);margin-bottom:6px">Market cap</div><div style="font-size:15px;font-weight:500;color:var(--text)">$1.26B</div></div>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Toggle</div>
+            <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;color:var(--text)">Alert</span><span style="position:relative;width:44px;height:26px;border-radius:999px;background:var(--accent)"><span style="position:absolute;top:3px;left:21px;width:20px;height:20px;border-radius:50%;background:#fff"></span></span></div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Chart container</div>
+          <div style="background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:12px">
+            <svg viewBox="0 0 300 70" width="100%" height="60" preserveAspectRatio="none"><defs><linearGradient id="bg${s.theme}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="color-mix(in srgb,var(--accent) 30%,transparent)"/><stop offset="1" stop-color="transparent"/></linearGradient></defs>
+            <path d="${this.path(this.series('btc','7d'),300,66,6).area}" fill="url(#bg${s.theme})"/>
+            <path d="${this.path(this.series('btc','7d'),300,66,6).line}" fill="none" stroke-width="2.2" style="stroke:var(--accent)"/></svg>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Bottom nav</div>
+          <div style="display:flex;background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:10px 4px">
+            <div style="flex:1;text-align:center;color:var(--accent)"><div style="display:flex;justify-content:center">${this.ICONS.market}</div><div style="font-size:10px;font-weight:500;margin-top:3px">Market</div></div>
+            <div style="flex:1;text-align:center;color:var(--muted)"><div style="display:flex;justify-content:center">${this.ICONS.portfolio}</div><div style="font-size:10px;margin-top:3px">Portfolio</div></div>
+            <div style="flex:1;text-align:center;color:var(--muted)"><div style="display:flex;justify-content:center">${this.ICONS.alerts}</div><div style="font-size:10px;margin-top:3px">Alerts</div></div>
+            <div style="flex:1;text-align:center;color:var(--muted)"><div style="display:flex;justify-content:center">${this.ICONS.settings}</div><div style="font-size:10px;margin-top:3px">Settings</div></div>
+          </div>
+        </div>
+      </div>`;
+
+    return {
+      appName:this.props.appName||'Nova',
+      themeVars,
+      // toolbar
+      tabAStyle:this.tSeg(s.theme==='A'), tabBStyle:this.tSeg(s.theme==='B'),
+      setThemeA:()=>this.set({theme:'A'}), setThemeB:()=>this.set({theme:'B'}),
+      viewStates,
+      // screen flags
+      isMarket:s.screen==='market', isDetail:s.screen==='detail',
+      isPortfolio:s.screen==='portfolio', isAlerts:s.screen==='alerts', isSettings:s.screen==='settings',
+      stPop:s.viewState==='populated', stLoading:s.viewState==='loading', stEmpty:s.viewState==='empty', stError:s.viewState==='error',
+      // market
+      marketCoins,
+      six:[1,2,3,4,5,6], four:[1,2,3,4],
+      skel:'background:linear-gradient(90deg, var(--s1) 25%, var(--s2) 37%, var(--s1) 63%);background-size:320px 100%;animation:shimmer 1.3s linear infinite',
+      totalFmt:this.fmt(total),
+      totalPlFmt:(tu?'+':'')+this.fmt(Math.abs(totalPl)),
+      totalPlPctFmt:(tu?'+':'')+(totalPl/totalCost*100).toFixed(1)+'%',
+      pfBadgeStyle:bigBadge(tu),
+      goPortfolio:(e)=>{if(e&&e.preventDefault)e.preventDefault();this.set({screen:'portfolio'});},
+      retry:()=>this.set({viewState:'populated'}),
+      // detail
+      sel, chartLine:cp.line, chartArea:cp.area, chartStroke, ranges,
+      goBack:()=>this.set({screen:'market'}),
+      addHolding:()=>this.set({sheet:'holding'}),
+      addHolding2:()=>this.set({sheet:'holding'}),
+      openAlertSheet:()=>this.set({sheet:'alert'}),
+      // portfolio
+      portfolio, donutSegs, holdingCount:holds.length,
+      // alerts
+      alerts, alertsShow:s.viewState!=='empty', alertsEmpty:s.viewState==='empty',
+      // nav
+      navs,
+      // sheet
+      sheetOpen:!!s.sheet, sheetIsAlert, sheetTitle, sheetSub, sheetFieldLabel, sheetFieldValue, sheetCta,
+      closeSheet:()=>this.set({sheet:null}),
+      confirmSheet:()=>{const msg=s.sheet==='alert'?'Alert created':'Added to portfolio';this.setState({sheet:null});this.toast(msg);},
+      // settings
+      inThemeA:inSeg(s.theme==='A'), inThemeB:inSeg(s.theme==='B'),
+      swatchA:swatch(s.theme==='A'), swatchB:swatch(s.theme==='B'),
+      curUsd:inSeg(s.currency==='USD'), curEur:inSeg(s.currency==='EUR'),
+      setUsd:()=>this.set({currency:'USD'}), setEur:()=>this.set({currency:'EUR'}),
+      notifTrack, notifKnob, toggleNotif:()=>this.set({notif:!s.notif}),
+      signOut:()=>this.toast('Signed out'),
+      // toast
+      toastShow:!!s.toast, toastMsg:s.toast||'',
+      // board
+      boardHtmlObj:{__html:boardHtml}
+    };
+  }
+}
+</script>
+</body>
+</html>
