@@ -20,7 +20,23 @@ abstract final class AppSpacing {
   static const double screenBottom = 108;
 
   // --- Bottom nav ---
+  /// Total nav height on the reference device (content + 24px home-indicator
+  /// inset). Real height is [navContentHeight] + top padding + the device's
+  /// bottom safe-area inset, so it adapts per device.
   static const double navHeight = 84;
+
+  /// Padding above the nav's icon/label row.
+  static const double navPaddingTop = 10;
+
+  /// Horizontal padding inside the nav.
+  static const double navPaddingH = 8;
+
+  /// Height of the nav's icon+label content row. With [navPaddingTop] and the
+  /// reference 24px inset this sums to [navHeight] (10 + 50 + 24 = 84).
+  static const double navContentHeight = 50;
+
+  /// How far the toast floats off the bottom edge.
+  static const double toastBottomInset = 100;
 
   // --- List rows ---
   static const double marketRow = 66;

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_flutter.dart';
 
 import 'core/constants/hive_boxes.dart';
+import 'core/navigation/nav_shell.dart';
 import 'core/persistence/box_providers.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_controller.dart';
@@ -48,12 +49,11 @@ class NovaApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ref.watch(themeControllerProvider);
-    // TODO(04-app-shell-nav): supply `home` from tasks/04-app-shell-nav.md.
     return MaterialApp(
       title: 'Nova',
       debugShowCheckedModeBanner: false,
       theme: AppThemes.of(theme),
-      home: const Scaffold(),
+      home: const NavShell(),
     );
   }
 }

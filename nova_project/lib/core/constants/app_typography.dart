@@ -33,6 +33,9 @@ abstract final class AppTypography {
   // Large numerals get negative tracking; it grows with size and matters most
   // on the 44px portfolio hero value.
   static const double trackTight = -0.2;
+
+  /// Screen / sheet titles (22–18px, weight 600).
+  static const double trackTitle = -0.4;
   static const double trackTighter = -0.5;
   static const double trackHero = -1;
 }

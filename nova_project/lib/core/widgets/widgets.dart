@@ -3,6 +3,7 @@
 library;
 
 export 'app_icon_button.dart';
+export 'app_scaffold.dart';
 export 'app_toast.dart';
 export 'coin_avatar.dart';
 export 'empty_state.dart';
