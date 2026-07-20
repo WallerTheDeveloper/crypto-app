@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../features/market/presentation/market_screen.dart';
 import '../overlays/sheet_host.dart';
 import '../overlays/toast_host.dart';
 import 'nav_bar.dart';
@@ -45,10 +46,7 @@ class NavShell extends ConsumerWidget {
               child: Navigator(
                 onDidRemovePage: (_) => notifier.closeDetail(),
                 pages: [
-                  const MaterialPage(
-                    key: ValueKey('tabs'),
-                    child: _TabStack(),
-                  ),
+                  const MaterialPage(key: ValueKey('tabs'), child: _TabStack()),
                   if (detailCoinId != null)
                     MaterialPage(
                       key: const ValueKey('detail'),
@@ -81,8 +79,8 @@ class _TabStack extends ConsumerWidget {
     return IndexedStack(
       index: tab.index,
       children: const [
-        // TODO(05-10): swap each for its real feature screen.
-        PlaceholderScreen(title: 'Market'),
+        // TODO(06-10): swap each remaining placeholder for its feature screen.
+        MarketScreen(),
         PlaceholderScreen(title: 'Portfolio'),
         PlaceholderScreen(title: 'Alerts'),
         PlaceholderScreen(title: 'Settings'),

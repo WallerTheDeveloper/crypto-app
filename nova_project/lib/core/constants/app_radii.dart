@@ -23,6 +23,9 @@ abstract final class AppRadii {
   /// Icon buttons.
   static const double iconButton = 11;
 
+  /// Brand logo mark — the 30×30 accent square in the market header.
+  static const double logo = 9;
+
   /// Chart boxes.
   static const double chartBox = 10;
 

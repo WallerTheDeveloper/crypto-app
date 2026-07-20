@@ -6,13 +6,16 @@ import 'package:nova_project/core/navigation/nav_controller.dart';
 import 'package:nova_project/core/navigation/nav_shell.dart';
 import 'package:nova_project/core/theme/app_theme.dart';
 
+import '../../support/market_test_support.dart';
+
 /// Pumps the shell inside a real Riverpod container so tests can drive the nav
-/// controller directly and read tokens off [theme].
+/// controller directly and read tokens off [theme]. The Market tab is the real
+/// screen now, so it gets fixed data (no Hive) via [marketScreenOverrides].
 Future<ProviderContainer> pumpShell(
   WidgetTester tester, {
   AppTheme theme = AppTheme.dark,
 }) async {
-  final container = ProviderContainer();
+  final container = ProviderContainer(overrides: marketScreenOverrides());
   addTearDown(container.dispose);
   await tester.pumpWidget(
     UncontrolledProviderScope(
@@ -32,10 +35,7 @@ Future<ProviderContainer> pumpShell(
 /// confused with a screen title of the same name.
 Color navLabelColor(WidgetTester tester, String label) {
   final text = tester.widget<Text>(
-    find.descendant(
-      of: find.byType(BottomNavBar),
-      matching: find.text(label),
-    ),
+    find.descendant(of: find.byType(BottomNavBar), matching: find.text(label)),
   );
   return text.style!.color!;
 }
@@ -104,8 +104,10 @@ void main() {
   testWidgets('back from detail returns to Market with scroll intact', (
     tester,
   ) async {
-    // A short viewport so the Market placeholder overflows and can scroll.
-    tester.view.physicalSize = const Size(360, 320);
+    // A short (but not narrow) viewport so the Market screen overflows
+    // vertically and can scroll. Width stays generous so the wider fallback
+    // font used in tests doesn't trip horizontal-overflow asserts.
+    tester.view.physicalSize = const Size(800, 400);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -116,7 +118,10 @@ void main() {
     final marketScroll = find.byType(Scrollable).hitTestable();
     await tester.drag(marketScroll, const Offset(0, -80));
     await tester.pumpAndSettle();
-    final scrolled = tester.state<ScrollableState>(marketScroll).position.pixels;
+    final scrolled = tester
+        .state<ScrollableState>(marketScroll)
+        .position
+        .pixels;
     expect(scrolled, greaterThan(0));
 
     // Open, then close, coin detail.

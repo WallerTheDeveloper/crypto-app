@@ -19,7 +19,8 @@ enum AppIconType {
   chevronRight(1.8),
   chevronDown(1.8),
   warning(1.7),
-  check(3);
+  check(3),
+  close(1.9);
 
   const AppIconType(this.strokeWidth);
 
@@ -199,5 +200,12 @@ Path _pathFor(AppIconType type) {
         ..moveTo(5, 12)
         ..lineTo(10, 17)
         ..lineTo(20, 6);
+    case AppIconType.close:
+      // M6 6l12 12 M18 6l-12 12 — an X for the search-field dismiss.
+      return Path()
+        ..moveTo(6, 6)
+        ..lineTo(18, 18)
+        ..moveTo(18, 6)
+        ..lineTo(6, 18);
   }
 }

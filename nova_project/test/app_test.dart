@@ -4,10 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nova_project/core/theme/app_theme.dart';
 import 'package:nova_project/core/theme/theme_controller.dart';
-import 'package:nova_project/core/widgets/app_scaffold.dart';
+import 'package:nova_project/features/market/presentation/market_screen.dart';
 import 'package:nova_project/main.dart';
 
 import 'support/fake_theme_store.dart';
+import 'support/market_test_support.dart';
 
 void main() {
   testWidgets('boots into the Inter-themed shell on the Market tab', (
@@ -15,15 +16,20 @@ void main() {
   ) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [themeStoreProvider.overrideWithValue(FakeThemeStore())],
+        overrides: [
+          themeStoreProvider.overrideWithValue(FakeThemeStore()),
+          ...marketScreenOverrides(),
+        ],
         child: const NovaApp(),
       ),
     );
+    await tester.pumpAndSettle();
 
-    // One shell Scaffold, no crash, and Market is the visible screen.
+    // One shell Scaffold, no crash, and the Market screen is the visible tab.
     expect(find.byType(Scaffold), findsOneWidget);
     expect(tester.takeException(), isNull);
-    expect(find.widgetWithText(AppScaffold, 'Market'), findsOneWidget);
+    expect(find.byType(MarketScreen), findsOneWidget);
+    expect(find.text('Nova'), findsOneWidget);
 
     final theme = Theme.of(tester.element(find.byType(Scaffold)));
     expect(theme.textTheme.bodyMedium?.fontFamily, 'Inter');
@@ -37,7 +43,10 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [themeStoreProvider.overrideWithValue(store)],
+        overrides: [
+          themeStoreProvider.overrideWithValue(store),
+          ...marketScreenOverrides(),
+        ],
         child: Consumer(
           builder: (context, r, _) {
             ref = r;
